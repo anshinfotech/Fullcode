@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Toaster, toast } from "sonner";
 import axios from "axios";
+import { getUsersAction } from "./Redux/Action/userAction";
+import { useDispatch, useSelector } from "react-redux";
 
 const App = () => {
   const [user, setUser] = useState([]);
@@ -8,22 +10,20 @@ const App = () => {
 
   const [newusername, setNewusername] = useState("");
 
+  const allusers = useSelector((state)=>state.users.users)
+  const loading = useSelector((state)=>state.users.loading)
+  const error = useSelector((state)=>state.users.error)
+  const message = useSelector((state)=>state.users.message)
+  console.log("ALL USERS",allusers);
+  console.log("Loading",loading);
+  console.log("Error",error);
+  console.log("message",message);
+
+
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await (
-          await fetch("http://localhost:8000/alldata")
-        ).json();
-        const allusers = data.alldata;
-        const message = data.message;
-        setUser(allusers);
-        setDisplaymessage(message);
-        toast.success(message);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchData();
+    dispatch(getUsersAction());
   }, []);
 
   const deleteData = async (id) => {
@@ -57,7 +57,7 @@ const App = () => {
   return (
     <>
       <Toaster richColors />
-      {user.map((e) => {
+      {allusers && allusers.map((e) => {
         return (
           <>
             <h1>{e.username}</h1>
